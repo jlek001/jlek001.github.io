@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Jianlong Lek — Security Architect &amp; Defender</title>
+<meta name="description" content="Jianlong Lek. Cybersecurity practitioner across security operations, threat hunting, incident response, and security architecture. Singapore." />
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #F6F2E9;
+    --paper-2: #EFEADC;
+    --paper-3: #E7E1D0;
+    --ink: #201E19;
+    --ink-soft: #565247;
+    --ink-faint: #8E887A;
+    --rule: #D9D2C0;
+    --rule-2: #C9C1AC;
+    --stamp: #C8401F;
+    --stamp-soft: rgba(200,64,31,0.09);
+    --blueprint: #35548B;
+  }
+
+  * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-weight: 300;
+    /* Drafting grid: fine + major lines */
+    background-image:
+      linear-gradient(to right, rgba(201,193,172,0.28) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(201,193,172,0.28) 1px, transparent 1px),
+      linear-gradient(to right, rgba(201,193,172,0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(201,193,172,0.5) 1px, transparent 1px);
+    background-size: 24px 24px, 24px 24px, 120px 120px, 120px 120px;
+    overflow-x: hidden;
+  }
+
+  .display { font-family: 'Fraunces', Georgia, serif; font-weight: 400; letter-spacing: -0.02em; line-height: 0.98; font-variation-settings: 'opsz' 144; }
+  .display-it { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 400; }
+  .display-light { font-family: 'Fraunces', Georgia, serif; font-weight: 300; }
+  .mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+
+  .label-mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  ::selection { background: var(--stamp); color: var(--paper); }
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--paper-2); }
+  ::-webkit-scrollbar-thumb { background: var(--rule-2); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+  /* Entrance */
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .rise { animation: rise 1s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .d1 { animation-delay: 0.05s; } .d2 { animation-delay: 0.18s; }
+  .d3 { animation-delay: 0.32s; } .d4 { animation-delay: 0.5s; }
+  .d5 { animation-delay: 0.7s; }
+
+  /* Stamp rotation wobble on hover */
+  .stamp-seal { transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+  .stamp-seal:hover { transform: rotate(-4deg) scale(1.03); }
+
+  @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .spin-slow { animation: spin-slow 40s linear infinite; transform-origin: center; }
+
+  /* Nav link */
+  .nav-link { position: relative; transition: color 0.35s ease; }
+  .nav-link::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px;
+    background: var(--stamp); transform: scaleX(0); transform-origin: right;
+    transition: transform 0.45s cubic-bezier(0.2,0.8,0.2,1);
+  }
+  .nav-link:hover { color: var(--stamp); }
+  .nav-link:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  /* Cert chip: drafting tag */
+  .cert-chip {
+    border: 1px solid var(--rule-2);
+    background: var(--paper);
+    padding: 0.45rem 0.9rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    color: var(--ink-soft);
+    transition: all 0.4s ease;
+    position: relative;
+  }
+  .cert-chip::before {
+    content: ''; position: absolute; top: -1px; left: -1px;
+    width: 6px; height: 6px;
+    border-top: 1px solid var(--stamp); border-left: 1px solid var(--stamp);
+    opacity: 0; transition: opacity 0.4s ease;
+  }
+  .cert-chip:hover { border-color: var(--ink); color: var(--ink); background: var(--paper-2); }
+  .cert-chip:hover::before { opacity: 1; }
+  .cert-chip.primary { border-color: var(--stamp); color: var(--stamp); }
+
+  /* Capability card: drawing detail */
+  .cap-card {
+    border-top: 1px solid var(--rule-2);
+    transition: background 0.5s ease, border-color 0.5s ease;
+  }
+  .cap-card:hover { background: rgba(239,234,220,0.7); border-top-color: var(--ink); }
+  .cap-card .num { transition: color 0.5s ease; }
+  .cap-card:hover .num { color: var(--stamp); }
+  .cap-card .icon-box svg { stroke: var(--ink-soft); fill: none; stroke-width: 1; transition: stroke 0.5s ease; }
+  .cap-card:hover .icon-box svg { stroke: var(--stamp); }
+
+  /* Figure frame: like a drawing sheet */
+  .fig-frame {
+    border: 1px solid var(--rule-2);
+    background: var(--paper);
+    box-shadow: 4px 4px 0 rgba(32,30,25,0.05);
+  }
+
+  /* Zone (floor plan) */
+  .zone { cursor: pointer; }
+  .zone .zone-fill { transition: fill 0.4s ease; }
+  .zone .zone-stroke { transition: stroke 0.4s ease, stroke-width 0.4s ease; }
+  .zone text { transition: fill 0.4s ease; }
+  .zone.active .zone-fill { fill: var(--stamp-soft); }
+  .zone.active .zone-stroke { stroke: var(--stamp); stroke-width: 2; }
+  .zone.active text { fill: var(--stamp); }
+  .zone.dim { opacity: 0.35; }
+
+  .zone-row { transition: all 0.4s ease; border-left: 2px solid var(--rule-2); cursor: pointer; }
+  .zone-row.active { border-left-color: var(--stamp); padding-left: 1.4rem; background: var(--stamp-soft); }
+  .zone-row.active .z-name { color: var(--stamp); }
+
+  /* Funnel stages */
+  .fstage { cursor: pointer; }
+  .fstage rect.bar { transition: fill 0.4s ease, stroke 0.4s ease; }
+  .fstage text { transition: fill 0.4s ease; }
+  .fstage.active rect.bar { fill: var(--stamp-soft); stroke: var(--stamp); }
+  .fstage.active text.count { fill: var(--stamp); }
+  .fstage.dim { opacity: 0.35; }
+
+  .fcard { transition: all 0.4s ease; border: 1px solid var(--rule-2); cursor: pointer; background: var(--paper); }
+  .fcard.active { border-color: var(--stamp); background: var(--stamp-soft); }
+  .fcard.active .f-num { color: var(--stamp); }
+
+  /* Kill chain links */
+  .klink { cursor: pointer; }
+  .klink .link-shape { transition: stroke 0.4s ease; }
+  .klink .cut-mark { opacity: 0; transition: opacity 0.3s ease; }
+  .klink text { transition: fill 0.4s ease; }
+  .klink.active .link-shape { stroke: var(--stamp); stroke-dasharray: 6 4; }
+  .klink.active .cut-mark { opacity: 1; }
+  .klink.active text { fill: var(--stamp); }
+  .klink.dim { opacity: 0.3; }
+
+  .krow { transition: all 0.4s ease; border-left: 2px solid var(--rule-2); cursor: pointer; }
+  .krow.active { border-left-color: var(--stamp); padding-left: 1.4rem; background: var(--stamp-soft); }
+  .krow.active .k-name { color: var(--stamp); }
+
+  /* Record rows in footer */
+  .rec-row { transition: background 0.4s ease; }
+  .rec-row:hover { background: rgba(239,234,220,0.8); }
+  .rec-row:hover .rec-org { color: var(--stamp); }
+  .rec-row .rec-org { transition: color 0.4s ease; }
+
+  /* Title block table */
+  .tblock { border: 1px solid var(--ink); }
+  .tblock > div { border-color: var(--ink) !important; }
+
+  /* Sheet index rows */
+  .sheet-row { transition: all 0.35s ease; }
+  .sheet-row:hover { color: var(--stamp); padding-left: 0.5rem; }
+
+  /* Underline sketch effect for em words */
+  .sketch-u { position: relative; white-space: nowrap; }
+  .sketch-u svg { position: absolute; left: 0; right: 0; bottom: -0.12em; width: 100%; height: 0.28em; }
+
+  .section-h { font-size: clamp(2.8rem, 7.5vw, 6.5rem); line-height: 0.95; letter-spacing: -0.03em; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ============ NAV ============ -->
+<nav class="fixed top-0 left-0 right-0 z-50 px-5 md:px-10 py-4 flex items-center justify-between" style="background: linear-gradient(180deg, rgba(246,242,233,0.96) 0%, rgba(246,242,233,0.85) 70%, transparent 100%);">
+  <a href="#cover" class="mono text-[0.68rem] tracking-[0.2em] flex items-center gap-3" style="color: var(--ink);">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--stamp)" stroke-width="1.2">
+      <rect x="1" y="1" width="14" height="14"/><path d="M1 1 L15 15 M15 1 L1 15"/>
+    </svg>
+    LEK&nbsp;JIANLONG
+  </a>
+  <div class="hidden md:flex items-center gap-9 mono text-[0.66rem] tracking-[0.2em]" style="color: var(--ink-soft);">
+    <a href="#practice" class="nav-link">A-100&nbsp;PRACTICE</a>
+    <a href="#method" class="nav-link">A-200&nbsp;METHOD</a>
+    <a href="#record" class="nav-link">A-300&nbsp;RECORD</a>
+  </div>
+  <div class="mono text-[0.62rem] tracking-[0.18em]" style="color: var(--ink-faint);">
+    REV&nbsp;B&nbsp;·&nbsp;<span style="color: var(--stamp);">ISSUED&nbsp;FOR&nbsp;USE</span>
+  </div>
+</nav>
+
+<!-- ============ HERO / SHEET A-000 ============ -->
+<section id="cover" class="relative min-h-screen flex flex-col px-5 md:px-10 pt-24 pb-8">
+  <div class="flex-1 flex flex-col max-w-[1500px] mx-auto w-full fig-frame relative overflow-hidden" style="box-shadow: 6px 6px 0 rgba(32,30,25,0.06);">
+
+    <!-- Sheet border ticks -->
+    <div class="absolute inset-3 pointer-events-none" style="border: 1px solid var(--rule-2);"></div>
+
+    <div class="relative flex-1 flex flex-col p-6 md:p-12">
+
+      <!-- Top meta row -->
+      <div class="rise d1 flex justify-between items-start mono text-[0.64rem] tracking-[0.2em]" style="color: var(--ink-faint);">
+        <div>
+          SHEET&nbsp;A-000&nbsp;·&nbsp;COVER<br/>
+          <span style="color: var(--rule-2);">—</span>
+        </div>
+        <div class="text-center hidden sm:block">
+          PERSONAL&nbsp;BRAND&nbsp;·&nbsp;DRAWING&nbsp;SET<br/>
+          <span style="color: var(--stamp);">SECURITY&nbsp;ARCHITECTURE&nbsp;&amp;&nbsp;OPERATIONS</span>
+        </div>
+        <div class="text-right">
+          SINGAPORE&nbsp;·&nbsp;UTC+8<br/>
+          1°22′N&nbsp;103°48′E
+        </div>
+      </div>
+
+      <!-- Name block -->
+      <div class="flex-1 flex flex-col justify-center py-14 md:py-10">
+        <p class="rise d2 display-it text-xl md:text-2xl mb-6 md:mb-8 max-w-2xl" style="color: var(--ink-soft);">
+          Defensive cybersecurity, drawn to scale — security operations, threat hunting, incident response, and the <span style="color: var(--stamp);">architecture</span> that holds them together.
+        </p>
+
+        <h1 class="display" style="font-size: clamp(3.6rem, 13.5vw, 13rem); letter-spacing: -0.035em; line-height: 0.9;">
+          <span class="rise d3 block">Jianlong</span>
+          <span class="rise d4 block display-it" style="color: var(--stamp); margin-left: 0.25em;">Lek<span class="display-light" style="color: var(--ink);">.</span></span>
+        </h1>
+      </div>
+
+      <!-- Stamp seal, positioned over the name area -->
+      <div class="stamp-seal absolute right-8 md:right-16 top-32 md:top-40 hidden sm:block" style="transform: rotate(6deg);">
+        <svg width="150" height="150" viewBox="0 0 150 150" class="md:w-[180px] md:h-[180px]">
+          <defs>
+            <path id="circA" d="M 75,75 m -56,0 a 56,56 0 1,1 112,0 a 56,56 0 1,1 -112,0"/>
+          </defs>
+          <g class="spin-slow">
+            <circle cx="75" cy="75" r="70" fill="none" stroke="var(--stamp)" stroke-width="1.5" opacity="0.85"/>
+            <circle cx="75" cy="75" r="64" fill="none" stroke="var(--stamp)" stroke-width="0.75" opacity="0.85"/>
+            <text fill="var(--stamp)" class="mono" style="font-size: 10.5px; letter-spacing: 0.32em;" opacity="0.9">
+              <textPath href="#circA">DEFEND · DETECT · RESPOND · ARCHITECT ·&nbsp;</textPath>
+            </text>
+          </g>
+          <g fill="var(--stamp)" text-anchor="middle" opacity="0.9">
+            <text x="75" y="66" class="mono" style="font-size: 9px; letter-spacing: 0.24em;">ISC²&nbsp;·&nbsp;ISSAP</text>
+            <text x="75" y="82" class="display-it" style="font-size: 17px;">verified</text>
+            <text x="75" y="97" class="mono" style="font-size: 8px; letter-spacing: 0.2em;">EST.&nbsp;2014</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Bottom: cert chips + stats + sheet index -->
+      <div class="rise d5 grid md:grid-cols-12 gap-8 items-end">
+        <div class="md:col-span-6">
+          <div class="label-mono mb-3">Credential stack</div>
+          <div class="flex flex-wrap gap-2">
+            <span class="cert-chip primary">ISSAP</span>
+            <span class="cert-chip">CISSP</span>
+            <span class="cert-chip">CISM</span>
+            <span class="cert-chip">CCSK</span>
+            <span class="cert-chip">GMON</span>
+            <span class="cert-chip">GCIH</span>
+          </div>
+        </div>
+
+        <div class="md:col-span-3 flex gap-10">
+          <div>
+            <div class="label-mono mb-1">Career</div>
+            <div class="display text-4xl md:text-5xl">11<span class="display-it" style="color: var(--stamp);">y</span></div>
+          </div>
+          <div>
+            <div class="label-mono mb-1">Certs</div>
+            <div class="display text-4xl md:text-5xl">11</div>
+          </div>
+        </div>
+
+        <div class="md:col-span-3">
+          <div class="label-mono mb-2">Sheet index</div>
+          <div class="mono text-[0.68rem] tracking-[0.16em] space-y-1" style="color: var(--ink-soft);">
+            <a href="#practice" class="sheet-row flex justify-between block"><span>A-100</span><span>WHAT&nbsp;I&nbsp;CAN&nbsp;DO</span></a>
+            <a href="#method" class="sheet-row flex justify-between block"><span>A-200</span><span>HOW&nbsp;I&nbsp;THINK</span></a>
+            <a href="#record" class="sheet-row flex justify-between block"><span>A-300</span><span>RECORD&nbsp;&amp;&nbsp;CONTACT</span></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRACTICE / SHEET A-100 ============ -->
+<section id="practice" class="px-5 md:px-10 py-20 md:py-28">
+  <div class="max-w-[1500px] mx-auto">
+
+    <div class="grid md:grid-cols-12 gap-8 mb-16 md:mb-20">
+      <div class="md:col-span-7">
+        <div class="label-mono mb-5" style="color: var(--stamp);">SHEET A-100 · CAPABILITIES</div>
+        <h2 class="display section-h">
+          What I can
+          <span class="display-it sketch-u" style="color: var(--stamp);">build<svg viewBox="0 0 120 10" preserveAspectRatio="none"><path d="M2 6 Q30 2 60 6 T118 5" fill="none" stroke="var(--stamp)" stroke-width="1.5"/></svg></span>
+          &amp; defend.
+        </h2>
+      </div>
+      <div class="md:col-span-5 md:pt-14">
+        <p class="text-lg leading-relaxed" style="color: var(--ink-soft);">
+          Five load-bearing disciplines. From the SOC floor at Singapore's Digital and Intelligence Service to the MINDEF/SAF CISO office, from corporate banking to the police reserve — <span class="display-it" style="color: var(--ink);">the drawing changes, the discipline doesn't.</span>
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <!-- 01 -->
+      <article class="cap-card grid md:grid-cols-12 gap-5 md:gap-10 py-9 md:py-12">
+        <div class="md:col-span-1 num display text-4xl" style="color: var(--ink-faint);">01</div>
+        <div class="md:col-span-2 icon-box">
+          <svg viewBox="0 0 56 56" width="52" height="52">
+            <circle cx="28" cy="28" r="21"/>
+            <circle cx="28" cy="28" r="13" stroke-dasharray="3 3"/>
+            <path d="M28 7 L28 15 M28 41 L28 49 M7 28 L15 28 M41 28 L49 28"/>
+            <circle cx="34" cy="22" r="2" fill="var(--stamp)" stroke="none"/>
+          </svg>
+        </div>
+        <div class="md:col-span-6">
+          <h3 class="display text-2xl md:text-[2rem] mb-3">Security Operations &amp; Threat Hunting</h3>
+          <p class="text-base leading-relaxed" style="color: var(--ink-soft);">
+            Hands-on detection and response across networks, endpoints, and cloud. Building hunt hypotheses from threat intelligence, tuning detections until adversaries surface from the noise of normal operations.
+          </p>
+        </div>
+        <div class="md:col-span-3 mono text-[0.66rem] tracking-[0.16em] md:text-right leading-loose" style="color: var(--ink-faint);">
+          SOC · SIEM · EDR<br/>CYBER THREAT HUNTING<br/>DETECTION ENGINEERING
+        </div>
+      </article>
+
+      <!-- 02 -->
+      <article class="cap-card grid md:grid-cols-12 gap-5 md:gap-10 py-9 md:py-12">
+        <div class="md:col-span-1 num display text-4xl" style="color: var(--ink-faint);">02</div>
+        <div class="md:col-span-2 icon-box">
+          <svg viewBox="0 0 56 56" width="52" height="52">
+            <path d="M8 28 L18 28 L23 14 L31 42 L36 28 L48 28"/>
+            <rect x="6" y="8" width="44" height="40" stroke-dasharray="3 3"/>
+          </svg>
+        </div>
+        <div class="md:col-span-6">
+          <h3 class="display text-2xl md:text-[2rem] mb-3">Incident Response &amp; Handling</h3>
+          <p class="text-base leading-relaxed" style="color: var(--ink-soft);">
+            Coordinating response when minutes matter — containment, eradication, recovery, and the no-blame post-mortem after. Every incident becomes a lesson encoded into the next defense.
+          </p>
+        </div>
+        <div class="md:col-span-3 mono text-[0.66rem] tracking-[0.16em] md:text-right leading-loose" style="color: var(--ink-faint);">
+          GCIH · NIST 800-61<br/>CONTAINMENT<br/>POST-MORTEM
+        </div>
+      </article>
+
+      <!-- 03 -->
+      <article class="cap-card grid md:grid-cols-12 gap-5 md:gap-10 py-9 md:py-12">
+        <div class="md:col-span-1 num display text-4xl" style="color: var(--ink-faint);">03</div>
+        <div class="md:col-span-2 icon-box">
+          <svg viewBox="0 0 56 56" width="52" height="52">
+            <path d="M8 40 L8 22 L28 10 L48 22 L48 40"/>
+            <path d="M8 40 L48 40"/>
+            <path d="M18 40 L18 28 L38 28 L38 40" stroke-dasharray="3 3"/>
+            <path d="M25 40 L25 34 L31 34 L31 40"/>
+          </svg>
+        </div>
+        <div class="md:col-span-6">
+          <h3 class="display text-2xl md:text-[2rem] mb-3">Security Architecture</h3>
+          <p class="text-base leading-relaxed" style="color: var(--ink-soft);">
+            The ISSAP discipline: designing systems where trust is explicit, boundaries are drawn before they're tested, and resilience is structural rather than bolted on. Blueprints that survive contact with adversaries.
+          </p>
+        </div>
+        <div class="md:col-span-3 mono text-[0.66rem] tracking-[0.16em] md:text-right leading-loose" style="color: var(--ink-faint);">
+          ISSAP · ZERO TRUST<br/>SEGMENTATION<br/>SECURE BY DESIGN
+        </div>
+      </article>
+
+      <!-- 04 -->
+      <article class="cap-card grid md:grid-cols-12 gap-5 md:gap-10 py-9 md:py-12">
+        <div class="md:col-span-1 num display text-4xl" style="color: var(--ink-faint);">04</div>
+        <div class="md:col-span-2 icon-box">
+          <svg viewBox="0 0 56 56" width="52" height="52">
+            <path d="M14 34 Q14 24 22 22 Q24 14 32 14 Q41 14 43 23 Q49 25 49 31 Q49 38 42 38 L18 38 Q14 38 14 34 Z"/>
+            <path d="M22 30 L26 34 L34 26" stroke-width="1.4"/>
+            <path d="M6 46 L50 46" stroke-dasharray="3 3"/>
+          </svg>
+        </div>
+        <div class="md:col-span-6">
+          <h3 class="display text-2xl md:text-[2rem] mb-3">Cloud, Application &amp; API Security</h3>
+          <p class="text-base leading-relaxed" style="color: var(--ink-soft);">
+            Securing the surfaces attackers actually touch — cloud workloads where identity is the new perimeter, and the APIs OWASP keeps writing about. Threat modelling and offensive testing to prove the defenses hold.
+          </p>
+        </div>
+        <div class="md:col-span-3 mono text-[0.66rem] tracking-[0.16em] md:text-right leading-loose" style="color: var(--ink-faint);">
+          CCSK · IAM<br/>OWASP API TOP 10<br/>API PEN TESTING
+        </div>
+      </article>
+
+      <!-- 05 -->
+      <article class="cap-card grid md:grid-cols-12 gap-5 md:gap-10 py-9 md:py-12" style="border-bottom: 1px solid var(--rule-2);">
+        <div class="md:col-span-1 num display text-4xl" style="color: var(--ink-faint);">05</div>
+        <div class="md:col-span-2 icon-box">
+          <svg viewBox="0 0 56 56" width="52" height="52">
+            <path d="M28 6 L46 14 L46 28 Q46 42 28 50 Q10 42 10 28 L10 14 Z"/>
+            <path d="M20 24 L36 24 M20 30 L32 30 M20 36 L28 36"/>
+          </svg>
+        </div>
+        <div class="md:col-span-6">
+          <h3 class="display text-2xl md:text-[2rem] mb-3">Security Management &amp; Governance</h3>
+          <p class="text-base leading-relaxed" style="color: var(--ink-soft);">
+            Aligning security programs with mission and business objectives — the CISM discipline practised in a national CISO office. Risk frameworks boards understand and engineers respect; metrics that mean something.
+          </p>
+        </div>
+        <div class="md:col-span-3 mono text-[0.66rem] tracking-[0.16em] md:text-right leading-loose" style="color: var(--ink-faint);">
+          CISM · ISO 27001<br/>NIST CSF<br/>RISK &amp; COMPLIANCE
+        </div>
+      </article>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ METHOD / SHEET A-200 ============ -->
+<section id="method" class="px-5 md:px-10 py-20 md:py-28">
+  <div class="max-w-[1500px] mx-auto">
+
+    <div class="grid md:grid-cols-12 gap-8 mb-16 md:mb-20">
+      <div class="md:col-span-7">
+        <div class="label-mono mb-5" style="color: var(--stamp);">SHEET A-200 · METHOD</div>
+        <h2 class="display section-h">
+          How I
+          <span class="display-it sketch-u" style="color: var(--stamp);">think<svg viewBox="0 0 120 10" preserveAspectRatio="none"><path d="M2 6 Q30 3 60 6 T118 4" fill="none" stroke="var(--stamp)" stroke-width="1.5"/></svg></span>.
+        </h2>
+      </div>
+      <div class="md:col-span-5 md:pt-14">
+        <p class="text-lg leading-relaxed" style="color: var(--ink-soft);">
+          Security is drawn before it's deployed. Three working drawings from the table — <span class="display-it" style="color: var(--ink);">hover anything to interrogate it.</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ======= FIGURE 01: ZERO-TRUST FLOOR PLAN ======= -->
+    <div class="mb-24 md:mb-32">
+      <div class="flex items-baseline justify-between flex-wrap gap-4 mb-6">
+        <div>
+          <div class="mono text-[0.66rem] tracking-[0.2em] mb-2" style="color: var(--stamp);">FIG. 01 — PLAN VIEW</div>
+          <h3 class="display text-3xl md:text-[2.6rem]">Trust is drawn, not assumed.</h3>
+        </div>
+        <p class="display-it text-lg md:text-xl max-w-sm md:text-right" style="color: var(--ink-soft);">A zero-trust estate, drafted as a floor plan. Identity is the gatehouse.</p>
+      </div>
+
+      <div class="fig-frame p-5 md:p-8">
+        <div class="grid lg:grid-cols-12 gap-8 items-center">
+
+          <div class="lg:col-span-7" id="plan-svg">
+            <svg viewBox="0 0 780 500" class="w-full" style="overflow: visible;">
+              <defs>
+                <pattern id="hatch" patternUnits="userSpaceOnUse" width="7" height="7">
+                  <path d="M0 7 L7 0" stroke="var(--rule-2)" stroke-width="1"/>
+                </pattern>
+                <pattern id="hatch-red" patternUnits="userSpaceOnUse" width="7" height="7">
+                  <path d="M0 7 L7 0" stroke="rgba(200,64,31,0.35)" stroke-width="1"/>
+                </pattern>
+              </defs>
+
+              <!-- EXTERIOR / UNTRUSTED (zone 1) -->
+              <g class="zone" data-zone="1">
+                <rect class="zone-fill" x="8" y="30" width="96" height="440" fill="rgba(231,225,208,0.5)"/>
+                <rect class="zone-stroke" x="8" y="30" width="96" height="440" fill="none" stroke="var(--rule-2)" stroke-width="1" stroke-dasharray="4 4"/>
+                <text x="56" y="250" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 10px; letter-spacing: 0.2em;" transform="rotate(-90 56 250)">UNTRUSTED · INTERNET</text>
+                <!-- Threat arrows -->
+                <g stroke="var(--ink-faint)" stroke-width="0.9" fill="none" opacity="0.7">
+                  <path d="M30 120 L86 120 M80 115 L86 120 L80 125"/>
+                  <path d="M30 250 L86 250 M80 245 L86 250 L80 255"/>
+                  <path d="M30 380 L86 380 M80 375 L86 380 L80 385"/>
+                </g>
+              </g>
+
+              <!-- Building outer wall (double line + hatch) -->
+              <rect x="120" y="30" width="640" height="440" fill="none" stroke="var(--ink)" stroke-width="2"/>
+              <rect x="128" y="38" width="624" height="424" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
+
+              <!-- Entry door gap + swing arc -->
+              <rect x="118" y="118" width="12" height="54" fill="var(--paper)"/>
+              <path d="M130 172 A 54 54 0 0 1 184 118" fill="none" stroke="var(--ink-faint)" stroke-width="0.8" stroke-dasharray="3 3"/>
+              <line x1="130" y1="172" x2="130" y2="118" stroke="var(--ink)" stroke-width="1.5"/>
+
+              <!-- EDGE / DMZ (zone 2) -->
+              <g class="zone" data-zone="2">
+                <rect class="zone-fill" x="128" y="38" width="102" height="424" fill="url(#hatch)" opacity="0.55"/>
+                <rect class="zone-stroke" x="128" y="38" width="102" height="424" fill="none" stroke="var(--ink-soft)" stroke-width="1"/>
+                <text x="179" y="250" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.2em;" transform="rotate(-90 179 250)">EDGE / DMZ</text>
+              </g>
+
+              <!-- IDENTITY GATEHOUSE (zone 3) -->
+              <g class="zone" data-zone="3">
+                <rect class="zone-fill" x="230" y="38" width="150" height="164" fill="rgba(53,84,139,0.05)"/>
+                <rect class="zone-stroke" x="230" y="38" width="150" height="164" fill="none" stroke="var(--ink)" stroke-width="1.4"/>
+                <text x="305" y="108" text-anchor="middle" fill="var(--ink)" class="mono" style="font-size: 10px; letter-spacing: 0.18em;">IDENTITY</text>
+                <text x="305" y="124" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8.5px; letter-spacing: 0.16em;">GATEHOUSE · MFA · JIT</text>
+                <!-- key symbol -->
+                <g stroke="var(--ink-soft)" stroke-width="1" fill="none">
+                  <circle cx="292" cy="150" r="7"/>
+                  <path d="M299 150 L322 150 M314 150 L314 157 M321 150 L321 156"/>
+                </g>
+              </g>
+
+              <!-- TELEMETRY SPINE (zone 5) -->
+              <g class="zone" data-zone="5">
+                <rect class="zone-fill" x="230" y="202" width="522" height="40" fill="rgba(53,84,139,0.08)"/>
+                <rect class="zone-stroke" x="230" y="202" width="522" height="40" fill="none" stroke="var(--blueprint)" stroke-width="1" stroke-dasharray="6 3"/>
+                <text x="491" y="226" text-anchor="middle" fill="var(--blueprint)" class="mono" style="font-size: 9.5px; letter-spacing: 0.24em;">TELEMETRY SPINE — EVERY ROOM REPORTS</text>
+              </g>
+
+              <!-- WORKLOAD SEGMENTS (zone 4) : 2x2 rooms -->
+              <g class="zone" data-zone="4">
+                <rect class="zone-fill" x="230" y="242" width="330" height="220" fill="transparent"/>
+                <g class="zone-stroke" fill="none" stroke="var(--ink-soft)" stroke-width="1">
+                  <rect x="230" y="242" width="160" height="105"/>
+                  <rect x="400" y="242" width="160" height="105"/>
+                  <rect x="230" y="357" width="160" height="105"/>
+                  <rect x="400" y="357" width="160" height="105"/>
+                </g>
+                <g fill="var(--ink-faint)" class="mono" style="font-size: 8.5px; letter-spacing: 0.16em;" text-anchor="middle">
+                  <text x="310" y="298">SEG · APP-01</text>
+                  <text x="480" y="298">SEG · APP-02</text>
+                  <text x="310" y="413">SEG · SVC-01</text>
+                  <text x="480" y="413">SEG · SVC-02</text>
+                </g>
+                <!-- internal door gaps drawn shut -->
+                <g stroke="var(--stamp)" stroke-width="1" opacity="0.6">
+                  <line x1="390" y1="285" x2="400" y2="305"/>
+                  <line x1="390" y1="400" x2="400" y2="420"/>
+                </g>
+              </g>
+
+              <!-- DATA VAULT (zone 6) -->
+              <g class="zone" data-zone="6">
+                <rect class="zone-fill" x="576" y="258" width="176" height="204" fill="url(#hatch)" opacity="0.5"/>
+                <rect class="zone-stroke" x="576" y="258" width="176" height="204" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+                <rect x="584" y="266" width="160" height="188" fill="none" stroke="var(--ink)" stroke-width="0.8"/>
+                <text x="664" y="352" text-anchor="middle" fill="var(--ink)" class="mono" style="font-size: 10px; letter-spacing: 0.2em;">DATA VAULT</text>
+                <text x="664" y="368" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8.5px; letter-spacing: 0.14em;">ENCRYPTED · CLASSIFIED · DLP</text>
+                <!-- vault dial -->
+                <g stroke="var(--ink-soft)" stroke-width="1" fill="none">
+                  <circle cx="664" cy="398" r="12"/>
+                  <circle cx="664" cy="398" r="4"/>
+                  <path d="M664 386 L664 382 M664 414 L664 410 M652 398 L648 398 M680 398 L676 398"/>
+                </g>
+              </g>
+
+              <!-- Dimension line bottom -->
+              <g stroke="var(--ink-faint)" stroke-width="0.7" fill="none">
+                <line x1="120" y1="486" x2="760" y2="486"/>
+                <line x1="120" y1="480" x2="120" y2="492"/>
+                <line x1="760" y1="480" x2="760" y2="492"/>
+              </g>
+              <text x="440" y="482" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8.5px; letter-spacing: 0.2em;">BLAST RADIUS — KNOWN &amp; BOUNDED</text>
+
+              <!-- North arrow -->
+              <g transform="translate(738, 62)" stroke="var(--ink-soft)" fill="none" stroke-width="1">
+                <circle r="14"/>
+                <path d="M0 -10 L5 6 L0 2 L-5 6 Z" fill="var(--stamp)" stroke="none"/>
+                <text y="-20" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px;">N</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="lg:col-span-5 space-y-2" id="plan-list">
+            <div class="zone-row pl-4 py-3" data-zone="1">
+              <div class="z-name display text-lg">Untrusted exterior</div>
+              <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Everything outside is hostile weather. Assume scanning, phishing, and probing as the ambient condition.</p>
+            </div>
+            <div class="zone-row pl-4 py-3" data-zone="2">
+              <div class="z-name display text-lg">Edge / DMZ</div>
+              <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Filtering, rate-limiting, and exposure kept deliberately thin. The wall matters — but nobody trusts a wall alone anymore.</p>
+            </div>
+            <div class="zone-row pl-4 py-3" data-zone="3">
+              <div class="z-name display text-lg">Identity gatehouse</div>
+              <p class="text-sm mt-0.5" style="color: var(--ink-faint);">The real front door. Strong auth, just-in-time access, continuous verification. Every entry is checked, every time.</p>
+            </div>
+            <div class="zone-row pl-4 py-3" data-zone="4">
+              <div class="z-name display text-lg">Micro-segmented rooms</div>
+              <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Workloads live in separate rooms with the internal doors shut. An intruder in one room does not get the house.</p>
+            </div>
+            <div class="zone-row pl-4 py-3" data-zone="5">
+              <div class="z-name display text-lg">Telemetry spine</div>
+              <p class="text-sm mt-0.5" style="color: var(--ink-faint);">A corridor of observability running through everything. If a room can't report, it doesn't get built.</p>
+            </div>
+            <div class="zone-row pl-4 py-3" data-zone="6">
+              <div class="z-name display text-lg">Data vault</div>
+              <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Thickest walls in the drawing. Encryption, classification, and loss prevention — the answer to "what are we actually protecting?"</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= FIGURE 02: DETECTION REFINERY ======= -->
+    <div class="mb-24 md:mb-32">
+      <div class="flex items-baseline justify-between flex-wrap gap-4 mb-6">
+        <div>
+          <div class="mono text-[0.66rem] tracking-[0.2em] mb-2" style="color: var(--stamp);">FIG. 02 — SECTION</div>
+          <h3 class="display text-3xl md:text-[2.6rem]">Detection is a refinery.</h3>
+        </div>
+        <p class="display-it text-lg md:text-xl max-w-sm md:text-right" style="color: var(--ink-soft);">Billions in, one truth out. Tuning is the craft; logging is just the quarry.</p>
+      </div>
+
+      <div class="fig-frame p-5 md:p-8">
+        <div class="overflow-x-auto pb-2" id="funnel-svg">
+          <svg viewBox="0 0 1040 320" class="w-full min-w-[860px]" style="overflow: visible;">
+            <!-- Baseline -->
+            <line x1="30" y1="270" x2="1010" y2="270" stroke="var(--ink)" stroke-width="1.2"/>
+            <!-- ground hatch -->
+            <g stroke="var(--rule-2)" stroke-width="0.8">
+              <line x1="40" y1="270" x2="30" y2="282"/><line x1="80" y1="270" x2="70" y2="282"/><line x1="120" y1="270" x2="110" y2="282"/>
+              <line x1="160" y1="270" x2="150" y2="282"/><line x1="200" y1="270" x2="190" y2="282"/><line x1="240" y1="270" x2="230" y2="282"/>
+              <line x1="280" y1="270" x2="270" y2="282"/><line x1="320" y1="270" x2="310" y2="282"/><line x1="360" y1="270" x2="350" y2="282"/>
+              <line x1="400" y1="270" x2="390" y2="282"/><line x1="440" y1="270" x2="430" y2="282"/><line x1="480" y1="270" x2="470" y2="282"/>
+              <line x1="520" y1="270" x2="510" y2="282"/><line x1="560" y1="270" x2="550" y2="282"/><line x1="600" y1="270" x2="590" y2="282"/>
+              <line x1="640" y1="270" x2="630" y2="282"/><line x1="680" y1="270" x2="670" y2="282"/><line x1="720" y1="270" x2="710" y2="282"/>
+              <line x1="760" y1="270" x2="750" y2="282"/><line x1="800" y1="270" x2="790" y2="282"/><line x1="840" y1="270" x2="830" y2="282"/>
+              <line x1="880" y1="270" x2="870" y2="282"/><line x1="920" y1="270" x2="910" y2="282"/><line x1="960" y1="270" x2="950" y2="282"/>
+              <line x1="1000" y1="270" x2="990" y2="282"/>
+            </g>
+
+            <!-- Flow line connecting bar tops -->
+            <path d="M110 60 L270 110 L430 150 L590 190 L750 222 L910 248" stroke="var(--stamp)" stroke-width="1" stroke-dasharray="5 4" fill="none" opacity="0.7"/>
+
+            <!-- Stage 1 -->
+            <g class="fstage" data-stage="1">
+              <rect class="bar" x="50" y="60" width="120" height="210" fill="rgba(231,225,208,0.6)" stroke="var(--ink-soft)" stroke-width="1"/>
+              <text class="count display" x="110" y="48" text-anchor="middle" fill="var(--ink)" style="font-size: 24px;">2B</text>
+              <text x="110" y="296" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">RAW EVENTS</text>
+              <text x="110" y="310" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.12em;">/ DAY</text>
+            </g>
+            <!-- Stage 2 -->
+            <g class="fstage" data-stage="2">
+              <rect class="bar" x="210" y="110" width="120" height="160" fill="rgba(231,225,208,0.6)" stroke="var(--ink-soft)" stroke-width="1"/>
+              <text class="count display" x="270" y="98" text-anchor="middle" fill="var(--ink)" style="font-size: 24px;">50M</text>
+              <text x="270" y="296" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">NORMALIZED</text>
+              <text x="270" y="310" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.12em;">PARSED · ENRICHED</text>
+            </g>
+            <!-- Stage 3 -->
+            <g class="fstage" data-stage="3">
+              <rect class="bar" x="370" y="150" width="120" height="120" fill="rgba(231,225,208,0.6)" stroke="var(--ink-soft)" stroke-width="1"/>
+              <text class="count display" x="430" y="138" text-anchor="middle" fill="var(--ink)" style="font-size: 24px;">120K</text>
+              <text x="430" y="296" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">CORRELATED</text>
+              <text x="430" y="310" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.12em;">RULES · ANALYTICS</text>
+            </g>
+            <!-- Stage 4 -->
+            <g class="fstage" data-stage="4">
+              <rect class="bar" x="530" y="190" width="120" height="80" fill="rgba(231,225,208,0.6)" stroke="var(--ink-soft)" stroke-width="1"/>
+              <text class="count display" x="590" y="178" text-anchor="middle" fill="var(--ink)" style="font-size: 24px;">400</text>
+              <text x="590" y="296" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">ALERTS</text>
+              <text x="590" y="310" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.12em;">TRIAGE QUEUE</text>
+            </g>
+            <!-- Stage 5 -->
+            <g class="fstage" data-stage="5">
+              <rect class="bar" x="690" y="222" width="120" height="48" fill="rgba(231,225,208,0.6)" stroke="var(--ink-soft)" stroke-width="1"/>
+              <text class="count display" x="750" y="210" text-anchor="middle" fill="var(--ink)" style="font-size: 24px;">12</text>
+              <text x="750" y="296" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">INVESTIGATED</text>
+              <text x="750" y="310" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.12em;">HUMAN + HUNT</text>
+            </g>
+            <!-- Stage 6 -->
+            <g class="fstage" data-stage="6">
+              <rect class="bar" x="850" y="248" width="120" height="22" fill="rgba(200,64,31,0.12)" stroke="var(--stamp)" stroke-width="1.2"/>
+              <text class="count display-it" x="910" y="236" text-anchor="middle" fill="var(--stamp)" style="font-size: 24px;">1</text>
+              <text x="910" y="296" text-anchor="middle" fill="var(--stamp)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">CONFIRMED</text>
+              <text x="910" y="310" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.12em;">TRUE POSITIVE</text>
+            </g>
+
+            <text x="30" y="24" fill="var(--ink-faint)" class="mono" style="font-size: 8.5px; letter-spacing: 0.2em;">VOLUMES REPRESENTATIVE · NOT TO SCALE — LIKE ALL GOOD SECTION DRAWINGS</text>
+          </svg>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-8" id="funnel-cards">
+          <div class="fcard p-5" data-stage="1">
+            <div class="flex items-baseline gap-3 mb-1.5"><span class="f-num display text-xl" style="color: var(--ink-faint);">01</span><span class="display text-lg">Collect wide</span></div>
+            <p class="text-sm" style="color: var(--ink-faint);">Visibility precedes defense. If it isn't logged, it didn't happen — and the attacker knows it.</p>
+          </div>
+          <div class="fcard p-5" data-stage="2">
+            <div class="flex items-baseline gap-3 mb-1.5"><span class="f-num display text-xl" style="color: var(--ink-faint);">02</span><span class="display text-lg">Normalize ruthlessly</span></div>
+            <p class="text-sm" style="color: var(--ink-faint);">Parse, enrich, deduplicate. Raw telemetry is ore, not metal — refinement starts at ingestion.</p>
+          </div>
+          <div class="fcard p-5" data-stage="3">
+            <div class="flex items-baseline gap-3 mb-1.5"><span class="f-num display text-xl" style="color: var(--ink-faint);">03</span><span class="display text-lg">Correlate for behavior</span></div>
+            <p class="text-sm" style="color: var(--ink-faint);">Single events lie; sequences confess. Map detections to adversary behavior, not just signatures.</p>
+          </div>
+          <div class="fcard p-5" data-stage="4">
+            <div class="flex items-baseline gap-3 mb-1.5"><span class="f-num display text-xl" style="color: var(--ink-faint);">04</span><span class="display text-lg">Tune or drown</span></div>
+            <p class="text-sm" style="color: var(--ink-faint);">Every false positive is a tax on the analyst. Alert fatigue is a design failure, not a staffing one.</p>
+          </div>
+          <div class="fcard p-5" data-stage="5">
+            <div class="flex items-baseline gap-3 mb-1.5"><span class="f-num display text-xl" style="color: var(--ink-faint);">05</span><span class="display text-lg">Investigate with hypotheses</span></div>
+            <p class="text-sm" style="color: var(--ink-faint);">Hunting is science: propose, test, conclude. Intuition guided by intelligence, recorded either way.</p>
+          </div>
+          <div class="fcard p-5" data-stage="6">
+            <div class="flex items-baseline gap-3 mb-1.5"><span class="f-num display text-xl" style="color: var(--ink-faint);">06</span><span class="display text-lg">Confirm, then encode</span></div>
+            <p class="text-sm" style="color: var(--ink-faint);">A true positive is a gift. The lesson goes back into the refinery so next time takes minutes, not days.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= FIGURE 03: KILL CHAIN ======= -->
+    <div>
+      <div class="flex items-baseline justify-between flex-wrap gap-4 mb-6">
+        <div>
+          <div class="mono text-[0.66rem] tracking-[0.2em] mb-2" style="color: var(--stamp);">FIG. 03 — DETAIL</div>
+          <h3 class="display text-3xl md:text-[2.6rem]">Break the chain early.</h3>
+        </div>
+        <p class="display-it text-lg md:text-xl max-w-sm md:text-right" style="color: var(--ink-soft);">Every intrusion is a sequence. Hover a link to see what cuts it.</p>
+      </div>
+
+      <div class="fig-frame p-5 md:p-8">
+        <div class="overflow-x-auto pb-2" id="chain-svg">
+          <svg viewBox="0 0 1120 190" class="w-full min-w-[900px]" style="overflow: visible;">
+            <!-- Chain links: alternating orientation rounded rects -->
+            <!-- Link geometry: each ~130 wide, overlapping 26 -->
+            <g fill="none">
+              <g class="klink" data-link="1">
+                <rect class="link-shape" x="28" y="60" width="128" height="60" rx="30" stroke="var(--ink)" stroke-width="2"/>
+                <g class="cut-mark" stroke="var(--stamp)" stroke-width="1.6">
+                  <line x1="82" y1="48" x2="102" y2="132"/><line x1="102" y1="48" x2="82" y2="132"/>
+                </g>
+                <text x="92" y="150" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">RECON</text>
+                <text x="92" y="166" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.1em;">01</text>
+              </g>
+              <g class="klink" data-link="2">
+                <rect class="link-shape" x="130" y="68" width="128" height="44" rx="22" stroke="var(--ink)" stroke-width="2"/>
+                <g class="cut-mark" stroke="var(--stamp)" stroke-width="1.6">
+                  <line x1="184" y1="56" x2="204" y2="124"/><line x1="204" y1="56" x2="184" y2="124"/>
+                </g>
+                <text x="194" y="40" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">WEAPONIZE</text>
+                <text x="194" y="26" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.1em;">02</text>
+              </g>
+              <g class="klink" data-link="3">
+                <rect class="link-shape" x="232" y="60" width="128" height="60" rx="30" stroke="var(--ink)" stroke-width="2"/>
+                <g class="cut-mark" stroke="var(--stamp)" stroke-width="1.6">
+                  <line x1="286" y1="48" x2="306" y2="132"/><line x1="306" y1="48" x2="286" y2="132"/>
+                </g>
+                <text x="296" y="150" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">DELIVER</text>
+                <text x="296" y="166" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.1em;">03</text>
+              </g>
+              <g class="klink" data-link="4">
+                <rect class="link-shape" x="334" y="68" width="128" height="44" rx="22" stroke="var(--ink)" stroke-width="2"/>
+                <g class="cut-mark" stroke="var(--stamp)" stroke-width="1.6">
+                  <line x1="388" y1="56" x2="408" y2="124"/><line x1="408" y1="56" x2="388" y2="124"/>
+                </g>
+                <text x="398" y="40" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">EXPLOIT</text>
+                <text x="398" y="26" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.1em;">04</text>
+              </g>
+              <g class="klink" data-link="5">
+                <rect class="link-shape" x="436" y="60" width="128" height="60" rx="30" stroke="var(--ink)" stroke-width="2"/>
+                <g class="cut-mark" stroke="var(--stamp)" stroke-width="1.6">
+                  <line x1="490" y1="48" x2="510" y2="132"/><line x1="510" y1="48" x2="490" y2="132"/>
+                </g>
+                <text x="500" y="150" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">INSTALL</text>
+                <text x="500" y="166" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.1em;">05</text>
+              </g>
+              <g class="klink" data-link="6">
+                <rect class="link-shape" x="538" y="68" width="128" height="44" rx="22" stroke="var(--ink)" stroke-width="2"/>
+                <g class="cut-mark" stroke="var(--stamp)" stroke-width="1.6">
+                  <line x1="592" y1="56" x2="612" y2="124"/><line x1="612" y1="56" x2="592" y2="124"/>
+                </g>
+                <text x="602" y="40" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">COMMAND &amp; CONTROL</text>
+                <text x="602" y="26" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.1em;">06</text>
+              </g>
+              <g class="klink" data-link="7">
+                <rect class="link-shape" x="640" y="60" width="128" height="60" rx="30" stroke="var(--ink)" stroke-width="2"/>
+                <g class="cut-mark" stroke="var(--stamp)" stroke-width="1.6">
+                  <line x1="694" y1="48" x2="714" y2="132"/><line x1="714" y1="48" x2="694" y2="132"/>
+                </g>
+                <text x="704" y="150" text-anchor="middle" fill="var(--ink-soft)" class="mono" style="font-size: 10px; letter-spacing: 0.16em;">ACTIONS</text>
+                <text x="704" y="166" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.1em;">07 · OBJECTIVES</text>
+              </g>
+
+              <!-- Objective marker -->
+              <g transform="translate(830, 90)">
+                <path d="M0 0 L60 0 M54 -5 L60 0 L54 5" stroke="var(--ink-faint)" stroke-width="1"/>
+                <g transform="translate(96, 0)" stroke="var(--stamp)" stroke-width="1.4" fill="none">
+                  <circle r="24"/>
+                  <circle r="15"/>
+                  <circle r="6"/>
+                  <circle r="2" fill="var(--stamp)" stroke="none"/>
+                </g>
+                <text x="96" y="46" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 9px; letter-spacing: 0.18em;">THE PRIZE</text>
+                <text x="96" y="60" text-anchor="middle" fill="var(--ink-faint)" class="mono" style="font-size: 8px; letter-spacing: 0.12em;">DENIED</text>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-x-12 gap-y-2 mt-8" id="chain-list">
+          <div class="krow pl-4 py-3" data-link="1">
+            <div class="k-name display text-lg">01 · Reconnaissance — <span class="display-it">deny them the map.</span></div>
+            <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Attack-surface management, minimal public footprint, honeytokens that make scouting expensive.</p>
+          </div>
+          <div class="krow pl-4 py-3" data-link="2">
+            <div class="k-name display text-lg">02 · Weaponization — <span class="display-it">watch the forges.</span></div>
+            <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Largely attacker-side, so defense is intelligence: track tooling, TTPs, and the infrastructure being staged.</p>
+          </div>
+          <div class="krow pl-4 py-3" data-link="3">
+            <div class="k-name display text-lg">03 · Delivery — <span class="display-it">filter the post.</span></div>
+            <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Mail and web gateways, sandbox detonation, user reporting culture. Most chains die here — cheaply.</p>
+          </div>
+          <div class="krow pl-4 py-3" data-link="4">
+            <div class="k-name display text-lg">04 · Exploitation — <span class="display-it">close the window.</span></div>
+            <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Patch cadence, hardening baselines, exploit mitigations. Every closed vulnerability is a link that can't form.</p>
+          </div>
+          <div class="krow pl-4 py-3" data-link="5">
+            <div class="k-name display text-lg">05 · Installation — <span class="display-it">refuse the tenant.</span></div>
+            <p class="text-sm mt-0.5" style="color: var(--ink-faint);">EDR, application control, persistence-hunting. The implant that can't survive a reboot was never really there.</p>
+          </div>
+          <div class="krow pl-4 py-3" data-link="6">
+            <div class="k-name display text-lg">06 · Command &amp; control — <span class="display-it">cut the phone line.</span></div>
+            <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Egress filtering, DNS analytics, beacon detection. Malware without its operator is just a file.</p>
+          </div>
+          <div class="krow pl-4 py-3" data-link="7">
+            <div class="k-name display text-lg">07 · Actions on objectives — <span class="display-it">guard the vault.</span></div>
+            <p class="text-sm mt-0.5" style="color: var(--ink-faint);">Segmentation, least privilege, DLP. Even a completed chain should find the prize out of reach.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ RECORD + FOOTER / SHEET A-300 ============ -->
+<footer id="record" class="px-5 md:px-10 pt-20 md:pt-28 pb-8">
+  <div class="max-w-[1500px] mx-auto">
+
+    <div class="grid md:grid-cols-12 gap-8 mb-14 md:mb-18">
+      <div class="md:col-span-7">
+        <div class="label-mono mb-5" style="color: var(--stamp);">SHEET A-300 · RECORD &amp; CONTACT</div>
+        <h2 class="display section-h">The <span class="display-it" style="color: var(--stamp);">record</span>.</h2>
+      </div>
+      <div class="md:col-span-5 md:pt-14">
+        <p class="text-lg leading-relaxed" style="color: var(--ink-soft);">
+          As-built drawings: where the work has been, what it earned, and how to reach me. <span class="display-it" style="color: var(--ink);">Receipts of a discipline practised, not just claimed.</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Career record -->
+    <div class="mb-14" style="border-top: 1px solid var(--rule-2);">
+      <div class="rec-row grid md:grid-cols-12 gap-2 md:gap-6 py-5 px-2" style="border-bottom: 1px solid var(--rule-2);">
+        <div class="md:col-span-2 mono text-[0.68rem] tracking-[0.16em] pt-1" style="color: var(--stamp);">2024 — NOW</div>
+        <div class="md:col-span-4 rec-org display text-xl">Ministry of Defence of Singapore</div>
+        <div class="md:col-span-4 text-base" style="color: var(--ink-soft);">Senior Analyst · Digital and Intelligence Service, Security Operations</div>
+        <div class="md:col-span-2 mono text-[0.64rem] tracking-[0.14em] md:text-right pt-1" style="color: var(--ink-faint);">SOC · CTH</div>
+      </div>
+      <div class="rec-row grid md:grid-cols-12 gap-2 md:gap-6 py-5 px-2" style="border-bottom: 1px solid var(--rule-2);">
+        <div class="md:col-span-2 mono text-[0.68rem] tracking-[0.16em] pt-1" style="color: var(--ink-faint);">2021 — 2024</div>
+        <div class="md:col-span-4 rec-org display text-xl">Ministry of Defence of Singapore</div>
+        <div class="md:col-span-4 text-base" style="color: var(--ink-soft);">Senior Manager · MINDEF / SAF CISO Office</div>
+        <div class="md:col-span-2 mono text-[0.64rem] tracking-[0.14em] md:text-right pt-1" style="color: var(--ink-faint);">IR · GOVERNANCE</div>
+      </div>
+      <div class="rec-row grid md:grid-cols-12 gap-2 md:gap-6 py-5 px-2" style="border-bottom: 1px solid var(--rule-2);">
+        <div class="md:col-span-2 mono text-[0.68rem] tracking-[0.16em] pt-1" style="color: var(--ink-faint);">2018 — 2021</div>
+        <div class="md:col-span-4 rec-org display text-xl">DBS Bank</div>
+        <div class="md:col-span-4 text-base" style="color: var(--ink-soft);">Technologist · Institutional Banking Group Technology — Application Security Champion 2019</div>
+        <div class="md:col-span-2 mono text-[0.64rem] tracking-[0.14em] md:text-right pt-1" style="color: var(--ink-faint);">TECH · APPSEC</div>
+      </div>
+      <div class="rec-row grid md:grid-cols-12 gap-2 md:gap-6 py-5 px-2" style="border-bottom: 1px solid var(--rule-2);">
+        <div class="md:col-span-2 mono text-[0.68rem] tracking-[0.16em] pt-1" style="color: var(--ink-faint);">2017 — 2018</div>
+        <div class="md:col-span-4 rec-org display text-xl">DBS Bank</div>
+        <div class="md:col-span-4 text-base" style="color: var(--ink-soft);">Technology Executive (SEED) · DevOps Engineer</div>
+        <div class="md:col-span-2 mono text-[0.64rem] tracking-[0.14em] md:text-right pt-1" style="color: var(--ink-faint);">DEVOPS</div>
+      </div>
+      <div class="rec-row grid md:grid-cols-12 gap-2 md:gap-6 py-5 px-2" style="border-bottom: 1px solid var(--rule-2);">
+        <div class="md:col-span-2 mono text-[0.68rem] tracking-[0.16em] pt-1" style="color: var(--ink-faint);">2014 — 2017</div>
+        <div class="md:col-span-4 rec-org display text-xl">EBIZ Marketing Solutions LLP</div>
+        <div class="md:col-span-4 text-base" style="color: var(--ink-soft);">Strategy &amp; Business Development Director</div>
+        <div class="md:col-span-2 mono text-[0.64rem] tracking-[0.14em] md:text-right pt-1" style="color: var(--ink-faint);">STRATEGY</div>
+      </div>
+      <div class="rec-row grid md:grid-cols-12 gap-2 md:gap-6 py-5 px-2" style="border-bottom: 1px solid var(--rule-2);">
+        <div class="md:col-span-2 mono text-[0.68rem] tracking-[0.16em] pt-1" style="color: var(--blueprint);">2011 — NOW</div>
+        <div class="md:col-span-4 rec-org display text-xl">Singapore Police Force</div>
+        <div class="md:col-span-4 text-base" style="color: var(--ink-soft);">Police Officer (Reservist) · Delta Special Task Force — concurrent national service</div>
+        <div class="md:col-span-2 mono text-[0.64rem] tracking-[0.14em] md:text-right pt-1" style="color: var(--blueprint);">CONCURRENT</div>
+      </div>
+    </div>
+
+    <!-- Credentials / education / awards / connect -->
+    <div class="grid md:grid-cols-12 gap-10 mb-16">
+      <div class="md:col-span-3">
+        <div class="label-mono mb-4">Certifications · 11</div>
+        <ul class="mono text-[0.72rem] tracking-[0.14em] space-y-1.5" style="color: var(--ink-soft);">
+          <li style="color: var(--stamp);">ISSAP — ISC²</li>
+          <li>CISSP — ISC²</li>
+          <li>CISM — ISACA</li>
+          <li>GMON — GIAC</li>
+          <li>GCIH — GIAC</li>
+          <li>CCSK — CSA</li>
+          <li>API PEN TESTING — APIsec U</li>
+          <li>OWASP API TOP 10 — APIsec U</li>
+          <li>SECURITY CHAMPION — SCW</li>
+          <li>CSM — SCRUM ALLIANCE</li>
+          <li>DIP+ ADV COMP MATH — NP</li>
+        </ul>
+      </div>
+      <div class="md:col-span-3">
+        <div class="label-mono mb-4">Education</div>
+        <p class="display text-lg mb-1">Nanyang Technological University</p>
+        <p class="text-sm mb-4" style="color: var(--ink-faint);">BEng (Hons), Information Engineering &amp; Media · 2013–2017</p>
+        <p class="display text-lg mb-1">Ngee Ann Polytechnic</p>
+        <p class="text-sm" style="color: var(--ink-faint);">Diploma in Financial Informatics · Director's List · 2008–2011</p>
+      </div>
+      <div class="md:col-span-3">
+        <div class="label-mono mb-4">Selected honours</div>
+        <ul class="text-sm space-y-2.5" style="color: var(--ink-soft);">
+          <li><span class="display text-base" style="color: var(--ink);">AWS DeepRacer</span><br/><span style="color: var(--ink-faint);">ASEAN Companies League Winner (Team DBS) · F1 ExecLeaders Winner · Summit Circuit H2H Winner · Nationals 3rd, 2023</span></li>
+          <li><span class="display text-base" style="color: var(--ink);">DBS 2019</span><br/><span style="color: var(--ink-faint);">AppSec Champion · Best AppSec Titan · Best Secure Code Warrior</span></li>
+          <li><span class="display text-base" style="color: var(--ink);">Microsoft Imagine Cup 2017</span><br/><span style="color: var(--ink-faint);">Semifinalist — 3D data visualiser in VR</span></li>
+        </ul>
+      </div>
+      <div class="md:col-span-3">
+        <div class="label-mono mb-4">Connect</div>
+        <a href="https://www.linkedin.com/in/jianlong-lek-909468129/" target="_blank" rel="noopener" class="nav-link display text-2xl inline-block mb-3" style="color: var(--ink);">LinkedIn&nbsp;↗</a>
+        <p class="text-sm mb-4" style="color: var(--ink-faint);">Singapore · UTC+8</p>
+        <p class="text-sm" style="color: var(--ink-soft);">Mentor at NTU under the Connecting Minds programme since 2018. Open to advisory, architecture review, and incident-readiness conversations.</p>
+      </div>
+    </div>
+
+    <!-- Title block -->
+    <div class="tblock grid grid-cols-2 md:grid-cols-6 mono text-[0.62rem] tracking-[0.14em]" style="color: var(--ink-soft); background: var(--paper);">
+      <div class="p-3 border-b md:border-b-0 border-r" style="border-color: var(--rule-2);">
+        <div class="label-mono mb-1" style="font-size: 0.55rem;">PROJECT</div>
+        PERSONAL BRAND
+      </div>
+      <div class="p-3 border-b md:border-b-0 md:border-r" style="border-color: var(--rule-2);">
+        <div class="label-mono mb-1" style="font-size: 0.55rem;">DRAWN BY</div>
+        J. LEK
+      </div>
+      <div class="p-3 border-b md:border-b-0 border-r" style="border-color: var(--rule-2);">
+        <div class="label-mono mb-1" style="font-size: 0.55rem;">CHECKED</div>
+        ADVERSARIES, DAILY
+      </div>
+      <div class="p-3 border-b md:border-b-0 md:border-r" style="border-color: var(--rule-2);">
+        <div class="label-mono mb-1" style="font-size: 0.55rem;">SCALE</div>
+        NTS
+      </div>
+      <div class="p-3 border-r" style="border-color: var(--rule-2);">
+        <div class="label-mono mb-1" style="font-size: 0.55rem;">REVISION</div>
+        <span style="color: var(--stamp);">B — REDRAWN</span>
+      </div>
+      <div class="p-3">
+        <div class="label-mono mb-1" style="font-size: 0.55rem;">SHEET</div>
+        1 OF 1 · © MMXXVI
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<!-- ============ INTERACTIVITY ============ -->
+<script>
+  // Generic hover-sync between an SVG group set and a list row set
+  function syncHover(svgWrapId, listId, svgSel, rowSel, dataKey) {
+    const svgWrap = document.getElementById(svgWrapId);
+    const list = document.getElementById(listId);
+    if (!svgWrap || !list) return;
+    const shapes = svgWrap.querySelectorAll(svgSel);
+    const rows = list.querySelectorAll(rowSel);
+
+    function activate(idx) {
+      shapes.forEach(s => {
+        s.classList.toggle('active', s.dataset[dataKey] === idx);
+        s.classList.toggle('dim', s.dataset[dataKey] !== idx);
+      });
+      rows.forEach(r => r.classList.toggle('active', r.dataset[dataKey] === idx));
+    }
+    function reset() {
+      shapes.forEach(s => s.classList.remove('active', 'dim'));
+      rows.forEach(r => r.classList.remove('active'));
+    }
+    [...shapes, ...rows].forEach(el => {
+      el.addEventListener('mouseenter', () => activate(el.dataset[dataKey]));
+      el.addEventListener('mouseleave', reset);
+    });
+  }
+
+  // Fig 01: floor plan zones
+  syncHover('plan-svg', 'plan-list', '.zone', '.zone-row', 'zone');
+  // Fig 02: funnel stages
+  syncHover('funnel-svg', 'funnel-cards', '.fstage', '.fcard', 'stage');
+  // Fig 03: kill chain links
+  syncHover('chain-svg', 'chain-list', '.klink', '.krow', 'link');
+</script>
+
+</body>
+</html>
