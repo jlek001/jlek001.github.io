@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Performance — IBKR</title>
+<meta name="description" content="Interactive Brokers trading performance: dashboard, trade metrics, journal, advanced reports and analytics with automatic options spread detection.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<div id="boot" class="loading">Loading IBKR dataset…</div>
+
+<div id="app" hidden>
+  <header class="top">
+    <a class="brand" href="../"><span class="dot"></span>Jianlong&nbsp;Lek</a>
+    <span class="label" id="stamp"></span>
+    <nav class="tabs">
+      <button data-view="dashboard">Dashboard</button>
+      <button data-view="journal">Journal</button>
+      <button data-view="positions">Positions</button>
+      <button data-view="analytics">Analytics</button>
+      <button data-view="reports">Reports</button>
+    </nav>
+    <button class="icon-btn" id="theme-btn" title="Theme">◑</button>
+  </header>
+
+  <main>
+    <section class="view" id="view-dashboard" hidden></section>
+    <section class="view" id="view-journal" hidden></section>
+    <section class="view" id="view-positions" hidden></section>
+    <section class="view" id="view-analytics" hidden></section>
+    <section class="view" id="view-reports" hidden></section>
+  </main>
+</div>
+
+<div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+<aside class="drawer" id="drawer" hidden></aside>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

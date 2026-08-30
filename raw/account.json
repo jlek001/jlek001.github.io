@@ -1,0 +1,8 @@
+{
+  "as_of": "2026-08-30T09:00:49Z",
+  "summary": {"currency":"USD","net_liquidation":142121.95,"equity_with_loan_value":141917.77,"buying_power":414804.25,"gross_position_value":167173.88,"total_cash_value":41876.81,"available_funds":62220.64,"initial_margin":79697.14,"maintenance_margin":73720.06,"excess_liquidity":68401.89,"dividends":0,"leverage":"1.18"},
+  "balances": [
+    {"currency":"BASE","cash_balance":41876.81,"settled_cash":41876.81,"net_liquidation_value":142121.9513,"stock_market_value":76272,"unrealized_pnl":6355.05,"realized_pnl":0,"exchange_rate":1},
+    {"currency":"USD","cash_balance":41876.81,"settled_cash":41876.81,"net_liquidation_value":142121.9513,"stock_market_value":76272,"unrealized_pnl":6355.05,"realized_pnl":0,"exchange_rate":1}
+  ]
+}

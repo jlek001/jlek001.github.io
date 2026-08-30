@@ -1,0 +1,10 @@
+{
+  "name": "jlek001-github-io",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:data": "node scripts/build-data.mjs",
+    "verify:data": "node scripts/verify.mjs",
+    "serve": "python3 -m http.server 8765"
+  }
+}
