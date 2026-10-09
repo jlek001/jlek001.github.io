@@ -3,8 +3,8 @@
  *
  * Reads the static snapshot in ./data (produced by scripts/build-data.mjs from
  * the IBKR connector) and renders dashboard, journal, positions, analytics and
- * reports entirely client-side. The journal layer lives in localStorage, so
- * notes stay on the machine that wrote them and survive data refreshes.
+ * reports entirely client-side. Journal entries live in the artifact's cloud
+ * database when available (browser localStorage otherwise) and survive refreshes.
  */
 import * as M from './metrics.js';
 import { lineChart, barChart, rankedBars, calendarHeatmap, histogramChart } from './charts.js';
@@ -50,19 +50,69 @@ const state = {
 /* --------------------------------------------------------------- journal */
 
 const JKEY = 'ibkr-journal-v1';
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } },
+};
+// Doc ids allow only letters, digits and _ - . ~ : @ +  — round-trip ids contain '|'.
+const docKey = (id) => id.replace(/\|/g, '~');
+const keyDoc = (k) => k.replace(/~/g, '|');
+
+/**
+ * Journal entries live in the artifact's cloud database (`journal` collection)
+ * when the viewer grants it, so notes follow the account across browsers and
+ * devices and are readable by Claude. Without it they fall back to this
+ * browser's localStorage, so the page still works standalone.
+ */
 const journal = {
   all: {},
+  col: null,
+  cloud: false,
   load() {
-    try { this.all = JSON.parse(localStorage.getItem(JKEY) || '{}'); }
-    catch { this.all = {}; }
+    try { this.all = JSON.parse(store.get(JKEY) || '{}'); } catch { this.all = {}; }
+  },
+  async connect(onChange) {
+    try {
+      const db = await window.claude?.use?.('db');
+      if (!db) return;
+      this.col = db.collection('journal');
+      await new Promise((resolve) => {
+        let first = true;
+        this.col.onSnapshot(
+          (snap) => {
+            const next = {};
+            for (const d of snap.docs) next[keyDoc(d.id)] = d.data();
+            this.all = next;
+            this.cloud = true;
+            store.set(JKEY, JSON.stringify(next));
+            if (first) { first = false; resolve(); } else onChange?.();
+          },
+          () => { this.cloud = false; if (first) { first = false; resolve(); } }
+        );
+        setTimeout(() => { if (first) { first = false; resolve(); } }, 6000);
+      });
+    } catch { /* no db: stay on local storage */ }
   },
   get(id) { return this.all[id] || { note: '', tags: [], rating: 0 }; },
-  set(id, entry) {
+  async set(id, entry) {
     const empty = !entry.note && !entry.tags.length && !entry.rating;
-    if (empty) delete this.all[id];
-    else this.all[id] = { ...entry, updated: new Date().toISOString() };
-    try { localStorage.setItem(JKEY, JSON.stringify(this.all)); return true; }
-    catch { return false; }   // private mode / quota — the UI reports this
+    const rec = { ...entry, updated: new Date().toISOString() };
+    if (empty) delete this.all[id]; else this.all[id] = rec;
+    const local = store.set(JKEY, JSON.stringify(this.all));
+    if (!this.col) return local;
+    try {
+      const ref = this.col.doc(docKey(id));
+      if (empty) await ref.delete(); else await ref.set(rec);
+      return true;
+    } catch { return local; }
+  },
+  async setMany(entries) {
+    Object.assign(this.all, entries);
+    store.set(JKEY, JSON.stringify(this.all));
+    if (!this.col) return;
+    for (const [id, rec] of Object.entries(entries)) {
+      try { await this.col.doc(docKey(id)).set(rec); } catch { /* keep going */ }
+    }
   },
   has(id) { return !!this.all[id]; },
   count() { return Object.keys(this.all).length; },
@@ -504,10 +554,10 @@ function openTrip(id) {
       c.classList.toggle('on');
     })
   );
-  $('#jr-save', drawer).addEventListener('click', () => {
+  $('#jr-save', drawer).addEventListener('click', async () => {
     const custom = $('#jr-custom', drawer).value.split(',').map((s) => s.trim()).filter(Boolean);
     const merged = [...new Set([...[...tags].filter((g) => PRESET_TAGS.includes(g)), ...custom])];
-    const ok = journal.set(id, { note: $('#jr-note', drawer).value.trim(), tags: merged, rating });
+    const ok = await journal.set(id, { note: $('#jr-note', drawer).value.trim(), tags: merged, rating });
     const flash = $('#jr-flash', drawer);
     flash.textContent = ok ? 'saved' : 'could not save — storage blocked';
     flash.classList.toggle('down', !ok);
@@ -738,7 +788,6 @@ function renderReports() {
       <button class="btn" data-csv="symbol">Symbol CSV</button>
       <button class="btn" data-csv="strategy">Strategy CSV</button>
       <button class="btn" data-csv="trades">All trades CSV</button>
-      <button class="btn" id="r-print">Print / PDF</button>
     </div>
 
     ${panel('Year summary', reportTable(byYear, 'Year'), '', true)}
@@ -786,7 +835,6 @@ function renderReports() {
       ]);
     })
   );
-  $('#r-print', root).addEventListener('click', () => window.print());
 }
 
 function reportTable(rows, label) {
@@ -824,23 +872,32 @@ function reportTable(rows, label) {
 
 /* ---------------------------------------------------------------- export */
 
+async function saveFile(filename, text) {
+  const dl = await window.claude?.use?.('downloads').catch(() => null);
+  if (dl) {
+    try { await dl.save({ filename, data: text }); } catch (e) { if (e?.code !== 'declined') toast(`Could not save ${filename}`); }
+    return;
+  }
+  // standalone fallback (page opened outside the viewer)
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function toast(msg) {
+  const t = Object.assign(document.createElement('div'), { className: 'chart-tip', textContent: msg });
+  t.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);pointer-events:none';
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+
 function downloadCsv(name, rows) {
   const csv = rows.map((r) => r.map((c) => {
     const s = String(c ?? '');
     return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   }).join(',')).join('\n');
-  downloadBlob(name, new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-}
-
-function downloadBlob(name, blob) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return saveFile(name, csv);
 }
 
 function exportTradesCsv() {
@@ -859,10 +916,9 @@ function exportTradesCsv() {
 }
 
 function backupJournal() {
-  downloadBlob(
+  return saveFile(
     `ibkr-journal-${new Date().toISOString().slice(0, 10)}.json`,
-    new Blob([JSON.stringify({ version: 1, exported: new Date().toISOString(), entries: journal.all }, null, 2)],
-      { type: 'application/json' })
+    JSON.stringify({ version: 1, exported: new Date().toISOString(), entries: journal.all }, null, 2)
   );
 }
 
@@ -878,8 +934,7 @@ function restoreJournal() {
       const entries = parsed.entries || parsed;
       if (typeof entries !== 'object' || Array.isArray(entries)) throw new Error('unrecognised file');
       const before = journal.count();
-      journal.all = { ...journal.all, ...entries };
-      localStorage.setItem(JKEY, JSON.stringify(journal.all));
+      await journal.setMany(entries);
       alert(`Journal restored. ${journal.count() - before} new entries merged; ${journal.count()} total.`);
       paintJournal();
     } catch (e) {
@@ -907,23 +962,21 @@ function show(view) {
     b.dataset.view === view ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current')
   );
   VIEWS[view]();
-  if (location.hash.slice(1) !== view) history.replaceState(null, '', `#${view}`);
+  if (location.hash.slice(1) !== view) { try { history.replaceState(null, '', `#${view}`); } catch { /* sandboxed frame */ } }
   window.scrollTo({ top: 0 });
 }
 
 function applyTheme(t) {
   if (t === 'auto') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('ibkr-theme', t);
+  store.set('ibkr-theme', t);
   $('#theme-btn').textContent = t === 'dark' ? '◐' : t === 'light' ? '○' : '◑';
   $('#theme-btn').title = `Theme: ${t}`;
 }
 
 async function boot() {
   journal.load();
-  try {
-    applyTheme(localStorage.getItem('ibkr-theme') || 'auto');
-  } catch { /* storage blocked; the default palette still applies */ }
+  applyTheme(store.get('ibkr-theme') || 'auto');
 
   try {
     await loadData();
@@ -934,6 +987,8 @@ async function boot() {
        (or GitHub&nbsp;Pages), not as a <code>file://</code> path.</div>`;
     return;
   }
+
+  await journal.connect(() => { if (state.view === 'journal') paintJournal(); });
 
   $('#boot').remove();
   $('#app').hidden = false;
@@ -946,7 +1001,7 @@ async function boot() {
   });
   $('#theme-btn').addEventListener('click', () => {
     const order = ['auto', 'light', 'dark'];
-    const cur = localStorage.getItem('ibkr-theme') || 'auto';
+    const cur = store.get('ibkr-theme') || 'auto';
     applyTheme(order[(order.indexOf(cur) + 1) % order.length]);
     show(state.view); // recolour charts under the new palette
   });

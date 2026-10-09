@@ -4,7 +4,19 @@ A static, client-side dashboard over an Interactive Brokers account: performance
 metrics, a trading journal, advanced reports and analytics, and automatic
 options spread detection.
 
-Live at `/trading/` on GitHub Pages.
+Hosted privately as a Claude artifact: https://claude.ai/artifact/CqZvzoCBxjJnKBhB9kurEP
+(readable only by its owner unless shared from the artifact's Share menu).
+The same files also run standalone from `/trading/` on any static server.
+
+## Cloud hosting
+
+The repository is public, so the artifact — not GitHub Pages — is where the
+numbers live. `node scripts/build-artifact.mjs` bundles the app into
+`dist/artifact/` (one inlined page plus `data/*.json`); publishing that to the
+artifact URL updates it. Journal notes are stored in the artifact's cloud
+database (`journal` collection) and follow the account across browsers; CSV and
+journal exports go through the artifact's file-save capability.
+
 
 ## How the data gets here
 
